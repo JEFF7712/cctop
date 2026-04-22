@@ -9,7 +9,6 @@
 - Single-file inspect.
 - CSV/JSON export.
 - Basic terminal UI when run in a real terminal.
-- No recommendations or automatic fix suggestions.
 
 ## Usage
 
@@ -60,10 +59,4 @@ pipx install .
 python -m pip install -e ".[dev]"
 python -m cctop .
 python -m unittest
-```
-
-Build release artifacts:
-
-```bash
-python -m build
 ```
