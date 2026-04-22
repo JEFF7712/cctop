@@ -1,0 +1,15 @@
+O   R   C   A
+Program Version 6.0.0
+
+INPUT FILE
+! r2SCAN-3c SP
+* xyz 0 1
+O    0.000000   0.000000   0.000000
+H    0.758602   0.000000   0.504284
+H   -0.758602   0.000000   0.504284
+*
+
+FINAL SINGLE POINT ENERGY     -76.438119772
+TOTAL RUN TIME: 0 days 0 hours 3 minutes 19 seconds
+****ORCA TERMINATED NORMALLY****
+

@@ -2,6 +2,8 @@
 
 `cctop` is a minimal terminal dashboard for computational chemistry output folders.
 
+![cctop demo terminal output](assets/cctop-demo.svg)
+
 - ORCA output parsing.
 - Directory scan.
 - Single-file inspect.
@@ -19,6 +21,12 @@ cctop export . --format json
 ```
 
 When stdout is not attached to a terminal, `cctop` prints a plain text summary instead of opening the TUI.
+
+Try the demo data:
+
+```bash
+cctop testing/demo_orca_project
+```
 
 ## Install
 

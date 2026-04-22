@@ -1,0 +1,27 @@
+O   R   C   A
+Program Version 6.0.0
+
+INPUT FILE
+! wB97X-D4 def2-TZVP Opt Freq TightSCF
+* xyz 0 1
+C   -0.742100   0.021400   0.000000
+C    0.742100  -0.021400   0.000000
+O    1.489200   1.123900   0.000000
+N   -1.480400  -1.070100   0.000000
+H   -1.270200   0.980300   0.000000
+H    1.286700  -0.965100   0.000000
+*
+
+FINAL SINGLE POINT ENERGY     -383.913284582
+
+VIBRATIONAL FREQUENCIES
+   0:         36.52 cm**-1
+   1:         79.18 cm**-1
+   2:        143.77 cm**-1
+   3:        412.26 cm**-1
+NORMAL MODES
+
+Final Gibbs free energy           ...     -383.842911
+TOTAL RUN TIME: 0 days 2 hours 14 minutes 8 seconds
+****ORCA TERMINATED NORMALLY****
+
