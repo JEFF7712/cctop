@@ -15,6 +15,13 @@ def load_calculations(path: Path) -> list[Calculation]:
     raise FileNotFoundError(path)
 
 
+def load_many_calculations(paths: list[Path]) -> list[Calculation]:
+    calculations: list[Calculation] = []
+    for path in paths:
+        calculations.extend(load_calculations(path))
+    return calculations
+
+
 def scan_directory(root: Path) -> list[Calculation]:
     files = [
         path

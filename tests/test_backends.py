@@ -6,7 +6,7 @@ from pathlib import Path
 
 from cctop.backends import supported_programs
 from cctop.models import Status
-from cctop.scan import parse_file, scan_directory
+from cctop.scan import load_many_calculations, parse_file, scan_directory
 
 
 ORCA_DONE = """
@@ -78,6 +78,32 @@ class BackendRegistryTest(unittest.TestCase):
 
         self.assertEqual(len(calculations), 1)
         self.assertEqual(calculations[0].program, "ORCA")
+
+    def test_scan_recurses_into_job_subdirectories(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "job_001").mkdir()
+            (root / "job_002").mkdir()
+            (root / "job_001" / "orca.out").write_text(ORCA_DONE)
+            (root / "job_002" / "orca.out").write_text(ORCA_DONE)
+
+            calculations = scan_directory(root)
+
+        self.assertEqual(len(calculations), 2)
+        self.assertEqual([calc.status for calc in calculations], [Status.DONE, Status.DONE])
+
+    def test_load_many_calculations_accepts_multiple_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "batch_a").mkdir()
+            (root / "batch_b").mkdir()
+            (root / "batch_a" / "orca.out").write_text(ORCA_DONE)
+            (root / "batch_b" / "qchem.out").write_text(QCHEM_DONE)
+
+            calculations = load_many_calculations([root / "batch_a", root / "batch_b"])
+
+        programs = sorted(calc.program for calc in calculations)
+        self.assertEqual(programs, ["ORCA", "Q-Chem"])
 
     def test_scan_routes_registered_backend_outputs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -31,10 +31,14 @@ Not yet supported:
 
 ```bash
 cctop .
+cctop job_001 job_002 job_003
 cctop path/to/orca.out
 cctop export .
+cctop export batch_a batch_b --format json
 cctop export . --format json
 ```
+
+Directory scans recurse into subdirectories, so `cctop .` works for project folders with one job per subfolder.
 
 When stdout is not attached to a terminal, `cctop` prints a plain text summary instead of opening the TUI.
 

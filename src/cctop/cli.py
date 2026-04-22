@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
 from .export import export_calculations
 from .render import plain_report
-from .scan import load_calculations
+from .scan import load_many_calculations
 from .tui import run_tui
 
 
@@ -19,12 +20,12 @@ def main(argv: list[str] | None = None) -> int:
 
 def _view_main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="cctop", description="Inspect computational chemistry output files.")
-    parser.add_argument("path", nargs="?", default=".", help="Output file or directory to inspect.")
+    parser.add_argument("paths", nargs="*", help="Output file or directory to inspect.")
     args = parser.parse_args(argv)
 
-    path = Path(args.path)
-    calculations = load_calculations(path)
-    root = path.expanduser().resolve() if path.is_dir() else path.expanduser().resolve().parent
+    paths = _input_paths(args.paths)
+    calculations = load_many_calculations(paths)
+    root = _display_root(paths)
 
     if not calculations:
         print("cctop: no supported output files found")
@@ -39,19 +40,37 @@ def _view_main(argv: list[str]) -> int:
 
 def _export_main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="cctop export", description="Export a cctop scan summary.")
-    parser.add_argument("path", nargs="?", default=".", help="Output file or directory to scan.")
+    parser.add_argument("paths", nargs="*", help="Output file or directory to scan.")
     parser.add_argument("--format", choices=("csv", "json"), default="csv", help="Export format.")
     parser.add_argument("--output", "-o", help="Output path.")
     args = parser.parse_args(argv)
 
-    path = Path(args.path)
-    calculations = load_calculations(path)
+    paths = _input_paths(args.paths)
+    calculations = load_many_calculations(paths)
     if not calculations:
         print("cctop export: no supported output files found", file=sys.stderr)
         return 1
 
     output_path = Path(args.output) if args.output else Path(f"cctop_summary.{args.format}")
-    root = path.expanduser().resolve() if path.is_dir() else path.expanduser().resolve().parent
+    root = _display_root(paths)
     export_calculations(calculations, output_path, args.format, root=root)
     print(f"wrote {output_path}")
     return 0
+
+
+def _input_paths(paths: list[str]) -> list[Path]:
+    if not paths:
+        return [Path(".")]
+    return [Path(path) for path in paths]
+
+
+def _display_root(paths: list[Path]) -> Path | None:
+    resolved = [path.expanduser().resolve() for path in paths]
+    if len(resolved) == 1:
+        path = resolved[0]
+        return path if path.is_dir() else path.parent
+    try:
+        roots = [path if path.is_dir() else path.parent for path in resolved]
+        return Path(os.path.commonpath(roots))
+    except (OSError, ValueError):
+        return None
