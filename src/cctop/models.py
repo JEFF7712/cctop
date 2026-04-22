@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 
 
-class Status(StrEnum):
+class Status(str, Enum):
     DONE = "DONE"
     RUNNING = "RUNNING"
     FAILED = "FAILED"

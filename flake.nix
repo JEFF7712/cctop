@@ -20,7 +20,7 @@
         {
           default = pkgs.python3Packages.buildPythonApplication {
             pname = "compchem-cctop";
-            version = "0.1.1";
+            version = "0.1.2";
             pyproject = true;
 
             src = self;
