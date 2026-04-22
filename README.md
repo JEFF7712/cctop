@@ -5,6 +5,7 @@
 ![cctop demo terminal output](assets/cctop.png)
 
 - ORCA output parsing.
+- Experimental VASP, Gaussian, Q-Chem, and xTB/CREST parsing.
 - Directory scan.
 - Single-file inspect.
 - CSV/JSON export.
@@ -15,13 +16,16 @@
 Current:
 
 - ORCA: status, final energy, method/basis, charge/multiplicity, Gibbs energy, frequencies, runtime, and common warning markers.
+- VASP: experimental `OUTCAR` and `OSZICAR` detection, status, final energy, runtime, and convergence markers.
+- Gaussian: experimental `.log`/`.out` status, route method/basis, charge/multiplicity, final energy, frequencies, runtime, and termination markers.
+- Q-Chem: experimental status, method/basis, charge/multiplicity, final energy, frequencies, runtime, and convergence markers.
+- xTB/CREST: experimental status, method hints, final energy, runtime, and convergence markers.
 
-Planned:
+Not yet supported:
 
-- VASP: `OUTCAR`, `OSZICAR`, and `vasprun.xml` job status, energies, and convergence signals.
-- Gaussian: `.log`/`.out` status, route info, energies, frequencies, and termination markers.
-- Q-Chem: output status, energies, methods, frequencies, and convergence markers.
-- xTB/CREST: quick status and energy summaries for screening workflows.
+- `vasprun.xml`
+- Rich per-step convergence history
+- Program-specific tables beyond the shared summary fields
 
 ## Usage
 
@@ -71,5 +75,7 @@ pipx install .
 ```bash
 python -m pip install -e ".[dev]"
 python -m cctop .
-python -m unittest
+python -m unittest discover -s tests
 ```
+
+The test suite includes small real-output fixtures from cclib and pymatgen, with their licenses included under `tests/fixtures/real/`.

@@ -4,8 +4,12 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+from .gaussian import looks_like_gaussian, parse_gaussian
 from .models import Calculation, Status
 from .orca import looks_like_orca, parse_orca
+from .qchem import looks_like_qchem, parse_qchem
+from .vasp import looks_like_vasp, parse_vasp
+from .xtb import looks_like_xtb, parse_xtb
 
 
 Detector = Callable[[Path], bool]
@@ -31,6 +35,34 @@ BACKENDS = (
         filenames=frozenset(),
         detect=looks_like_orca,
         parse=parse_orca,
+    ),
+    Backend(
+        name="VASP",
+        suffixes=frozenset({".out", ".log"}),
+        filenames=frozenset({"outcar", "oszicar"}),
+        detect=looks_like_vasp,
+        parse=parse_vasp,
+    ),
+    Backend(
+        name="Gaussian",
+        suffixes=frozenset({".out", ".log"}),
+        filenames=frozenset(),
+        detect=looks_like_gaussian,
+        parse=parse_gaussian,
+    ),
+    Backend(
+        name="Q-Chem",
+        suffixes=frozenset({".out", ".log"}),
+        filenames=frozenset(),
+        detect=looks_like_qchem,
+        parse=parse_qchem,
+    ),
+    Backend(
+        name="xTB/CREST",
+        suffixes=frozenset({".out", ".log"}),
+        filenames=frozenset(),
+        detect=looks_like_xtb,
+        parse=parse_xtb,
     ),
 )
 

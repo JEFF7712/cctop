@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compchem-cctop"
-version = "0.1.5"
+version = "0.2.0"
 description = "A minimal terminal dashboard for computational chemistry output files."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,7 +13,7 @@ authors = [
 ]
 license = "MIT"
 license-files = ["LICENSE"]
-keywords = ["computational-chemistry", "orca", "cli", "tui"]
+keywords = ["computational-chemistry", "orca", "vasp", "gaussian", "qchem", "xtb", "cli", "tui"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
