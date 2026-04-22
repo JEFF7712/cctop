@@ -2,7 +2,7 @@
 
 `cctop` is a minimal terminal dashboard for computational chemistry output folders.
 
-![cctop demo terminal output](assets/cctop-demo.svg)
+![cctop demo terminal output](assets/cctop.png)
 
 - ORCA output parsing.
 - Directory scan.
