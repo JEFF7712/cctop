@@ -1,0 +1,23 @@
+O   R   C   A
+Program Version 6.0.0
+
+INPUT FILE
+! B3LYP def2-SVP Opt Freq
+* xyz 0 1
+C  0.000000  0.000000  0.000000
+O  1.210000  0.000000  0.000000
+H -0.610000  0.910000  0.000000
+H -0.610000 -0.910000  0.000000
+*
+
+FINAL SINGLE POINT ENERGY     -114.381225811
+
+VIBRATIONAL FREQUENCIES
+   0:        -32.77 cm**-1
+   1:         89.30 cm**-1
+   2:        395.61 cm**-1
+NORMAL MODES
+
+Final Gibbs free energy           ...     -114.338900
+TOTAL RUN TIME: 0 days 0 hours 20 minutes 4 seconds
+****ORCA TERMINATED NORMALLY****

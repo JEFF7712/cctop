@@ -1,0 +1,2 @@
+This is not a computational chemistry output file.
+It exists to verify that cctop can include unsupported .log files as UNKNOWN.

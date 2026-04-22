@@ -1,0 +1,14 @@
+O   R   C   A
+Program Version 6.0.0
+
+INPUT FILE
+! PBE0 def2-TZVP Opt TightSCF
+* xyz 1 2
+Fe 0.000000 0.000000 0.000000
+N  1.900000 0.000000 0.000000
+N -1.900000 0.000000 0.000000
+*
+
+SCF NOT CONVERGED AFTER 500 CYCLES
+ORCA finished by error termination
+TOTAL RUN TIME: 0 days 1 hours 11 minutes 9 seconds
