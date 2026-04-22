@@ -10,6 +10,19 @@
 - CSV/JSON export.
 - Basic terminal UI when run in a real terminal.
 
+## Support
+
+Current:
+
+- ORCA: status, final energy, method/basis, charge/multiplicity, Gibbs energy, frequencies, runtime, and common warning markers.
+
+Planned:
+
+- VASP: `OUTCAR`, `OSZICAR`, and `vasprun.xml` job status, energies, and convergence signals.
+- Gaussian: `.log`/`.out` status, route info, energies, frequencies, and termination markers.
+- Q-Chem: output status, energies, methods, frequencies, and convergence markers.
+- xTB/CREST: quick status and energy summaries for screening workflows.
+
 ## Usage
 
 ```bash

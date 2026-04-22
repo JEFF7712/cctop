@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .backends import is_supported_candidate, parse_supported_file
 from .models import Calculation, Status
-from .orca import looks_like_orca, parse_orca
-
-OUTPUT_SUFFIXES = {".out", ".log"}
 
 
 def load_calculations(path: Path) -> list[Calculation]:
@@ -21,16 +19,14 @@ def scan_directory(root: Path) -> list[Calculation]:
     files = [
         path
         for path in root.rglob("*")
-        if path.is_file() and path.suffix.lower() in OUTPUT_SUFFIXES
+        if path.is_file() and is_supported_candidate(path)
     ]
     calculations = [parse_file(path) for path in sorted(files)]
     return calculations
 
 
 def parse_file(path: Path) -> Calculation:
-    if looks_like_orca(path):
-        return parse_orca(path)
-    return Calculation(path=path, status=Status.UNKNOWN)
+    return parse_supported_file(path)
 
 
 def summarize_status(calculations: list[Calculation]) -> dict[Status, int]:
