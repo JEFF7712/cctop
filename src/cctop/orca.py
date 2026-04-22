@@ -17,7 +17,15 @@ FATAL_PATTERNS = [
 
 SUSPICIOUS_PATTERNS = [
     ("GEOM_NOT_CONVERGED", "Geometry optimization did not converge", re.compile(r"geometry optimization.*not.*converged|optimization.*not.*converged", re.I)),
-    ("MAX_ITER", "Maximum iteration marker found", re.compile(r"maximum number of.*iterations|maxiter", re.I)),
+    (
+        "MAX_ITER",
+        "Maximum iteration limit was reached",
+        re.compile(
+            r"(?:maximum number of.*iterations|maxiter).*(?:reached|exceeded)"
+            r"|(?:reached|exceeded).*(?:maximum number of.*iterations|maxiter)",
+            re.I,
+        ),
+    ),
 ]
 
 BASIS_HINTS = (

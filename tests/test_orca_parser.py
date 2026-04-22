@@ -56,6 +56,40 @@ H 0 0 1
 *
 """
 
+ORCA_DLPNO_SINGLE_POINT = """
+O   R   C   A
+Program Version 6.0.0
+
+INPUT FILE
+! DLPNO-CCSD(T) def2-TZVPP TightSCF
+%mdci
+  MaxIter 200
+end
+* xyz 0 1
+C 0 0 0
+O 0 0 1.2
+*
+
+Maximum number of iterations          ...     200
+FINAL SINGLE POINT ENERGY     -113.292884931
+TOTAL RUN TIME: 0 days 3 hours 21 minutes 9 seconds
+****ORCA TERMINATED NORMALLY****
+"""
+
+ORCA_MAX_ITER_REACHED = """
+O   R   C   A
+Program Version 6.0.0
+! B3LYP def2-SVP Opt
+* xyz 0 1
+H 0 0 0
+H 0 0 1
+*
+Maximum number of geometry iterations has been reached
+FINAL SINGLE POINT ENERGY     -1.123456789
+TOTAL RUN TIME: 0 days 1 hours 2 minutes 3 seconds
+****ORCA TERMINATED NORMALLY****
+"""
+
 
 class OrcaParserTest(unittest.TestCase):
     def test_done_output(self) -> None:
@@ -85,6 +119,18 @@ class OrcaParserTest(unittest.TestCase):
     def test_recent_incomplete_output_is_running(self) -> None:
         calc = self._parse(ORCA_RUNNING)
         self.assertEqual(calc.status, Status.RUNNING)
+
+    def test_dlpno_single_point_maxiter_setting_is_done(self) -> None:
+        calc = self._parse(ORCA_DLPNO_SINGLE_POINT)
+        self.assertEqual(calc.status, Status.DONE)
+        self.assertEqual(calc.method, "DLPNO-CCSD(T)")
+        self.assertEqual(calc.basis, "def2-TZVPP")
+        self.assertEqual(calc.warning_count, 0)
+
+    def test_reached_max_iterations_is_suspicious(self) -> None:
+        calc = self._parse(ORCA_MAX_ITER_REACHED)
+        self.assertEqual(calc.status, Status.SUSPICIOUS)
+        self.assertEqual(calc.warning_count, 1)
 
     def _parse(self, content: str):
         with tempfile.TemporaryDirectory() as tmp:
