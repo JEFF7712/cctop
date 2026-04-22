@@ -22,6 +22,18 @@ When stdout is not attached to a terminal, `cctop` prints a plain text summary i
 
 ## Install
 
+From PyPI:
+
+```bash
+pipx install compchem-cctop
+```
+
+or:
+
+```bash
+python -m pip install compchem-cctop
+```
+
 For a local checkout:
 
 ```bash
