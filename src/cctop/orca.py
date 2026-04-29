@@ -177,9 +177,9 @@ def _parse_method_basis(command_line: str) -> tuple[str | None, str | None]:
 
 
 def _find_charge_multiplicity(lines: list[str]) -> tuple[int, int] | None:
-    pattern = re.compile(r"^\s*\*\s+(?:xyz|int|gzmt|xyzfile)\s+(-?\d+)\s+(\d+)", re.I)
+    pattern = re.compile(r"^\*\s+(?:xyz|int|gzmt|xyzfile)\s+(-?\d+)\s+(\d+)", re.I)
     for line in lines:
-        match = pattern.search(line)
+        match = pattern.match(_strip_input_prefix(line))
         if match:
             return int(match.group(1)), int(match.group(2))
     return None
