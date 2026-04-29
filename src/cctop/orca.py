@@ -141,13 +141,22 @@ def _find_orca_command(lines: list[str]) -> str | None:
         if "INPUT FILE" in line:
             in_input = True
             continue
-        if in_input and line.strip().startswith("!"):
-            return line.strip()
+        if in_input:
+            stripped = _strip_input_prefix(line)
+            if stripped.startswith("!"):
+                return stripped
 
     for line in lines[:500]:
-        if line.strip().startswith("!"):
-            return line.strip()
+        stripped = _strip_input_prefix(line)
+        if stripped.startswith("!"):
+            return stripped
     return None
+
+
+def _strip_input_prefix(line: str) -> str:
+    stripped = line.strip()
+    match = re.match(r"^\|\s*\d+>\s*(.*)", stripped)
+    return match.group(1).strip() if match else stripped
 
 
 def _parse_method_basis(command_line: str) -> tuple[str | None, str | None]:
@@ -161,7 +170,7 @@ def _parse_method_basis(command_line: str) -> tuple[str | None, str | None]:
         if basis is None and lowered.startswith(BASIS_HINTS):
             basis = token
             continue
-        if method is None and lowered not in METHOD_SKIP and not lowered.startswith("%"):
+        if method is None and lowered not in METHOD_SKIP and not lowered.startswith(("%", "smd(")):
             method = token
 
     return method, basis
