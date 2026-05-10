@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 import time
+from dataclasses import dataclass
+from math import dist
 from pathlib import Path
 
 from .models import Calculation, Status, Warning
@@ -73,6 +75,13 @@ METHOD_SKIP = {
 }
 
 
+@dataclass(frozen=True, slots=True)
+class OrcaOptimizationHistory:
+    energies: list[float]
+    distances: list[float]
+    trajectory_path: Path
+
+
 def parse_orca(path: Path) -> Calculation:
     text = path.read_text(errors="replace")
     lines = text.splitlines()
@@ -114,12 +123,104 @@ def parse_orca(path: Path) -> Calculation:
     return calc
 
 
+def parse_orca_optimization_history(
+    output_path: Path,
+    atom_a: int,
+    atom_b: int,
+    trajectory_path: Path | None = None,
+) -> OrcaOptimizationHistory:
+    if atom_a < 0 or atom_b < 0:
+        raise ValueError("atom indices must be zero-based non-negative integers")
+    if atom_a == atom_b:
+        raise ValueError("atom indices must refer to two different atoms")
+
+    text = output_path.read_text(errors="replace")
+    energy_pattern = r"FINAL SINGLE POINT ENERGY\s+(" + FLOAT_RE + r")"
+    energies = [float(match) for match in re.findall(energy_pattern, text)]
+
+    trajectory_path = trajectory_path or output_path.with_name(f"{output_path.stem}_trj.xyz")
+    distances = _parse_orca_trajectory_distances(trajectory_path, atom_a, atom_b)
+    return OrcaOptimizationHistory(
+        energies=energies,
+        distances=distances,
+        trajectory_path=trajectory_path,
+    )
+
+
+def write_orca_optimization_history(
+    history: OrcaOptimizationHistory,
+    energy_output_path: Path,
+    distance_output_path: Path,
+) -> None:
+    _write_series(energy_output_path, "step energy_hartree", history.energies)
+    _write_series(distance_output_path, "step distance_angstrom", history.distances)
+
+
 def looks_like_orca(path: Path) -> bool:
     try:
         head = path.read_text(errors="replace")[:8000]
     except OSError:
         return False
     return "O   R   C   A" in head or "ORCA" in head and "Program Version" in head
+
+
+def _parse_orca_trajectory_distances(path: Path, atom_a: int, atom_b: int) -> list[float]:
+    lines = path.read_text(errors="replace").splitlines()
+    distances: list[float] = []
+    index = 0
+    frame_number = 0
+
+    while index < len(lines):
+        while index < len(lines) and not lines[index].strip():
+            index += 1
+        if index >= len(lines):
+            break
+
+        try:
+            atom_count = int(lines[index].strip())
+        except ValueError as exc:
+            raise ValueError(f"{path}: expected atom count at line {index + 1}") from exc
+
+        frame_number += 1
+        coordinate_start = index + 2
+        coordinate_end = coordinate_start + atom_count
+        if coordinate_end > len(lines):
+            raise ValueError(f"{path}: frame {frame_number} is truncated")
+        if atom_a >= atom_count or atom_b >= atom_count:
+            raise ValueError(
+                f"{path}: atom index out of range for frame {frame_number} with {atom_count} atoms"
+            )
+
+        coord_a = _parse_xyz_coordinate(
+            lines[coordinate_start + atom_a],
+            path,
+            coordinate_start + atom_a + 1,
+        )
+        coord_b = _parse_xyz_coordinate(
+            lines[coordinate_start + atom_b],
+            path,
+            coordinate_start + atom_b + 1,
+        )
+        distances.append(dist(coord_a, coord_b))
+        index = coordinate_end
+
+    return distances
+
+
+def _parse_xyz_coordinate(line: str, path: Path, line_number: int) -> tuple[float, float, float]:
+    parts = line.split()
+    if len(parts) < 4:
+        raise ValueError(f"{path}: expected XYZ coordinate at line {line_number}")
+    try:
+        return float(parts[1]), float(parts[2]), float(parts[3])
+    except ValueError as exc:
+        raise ValueError(f"{path}: invalid XYZ coordinate at line {line_number}") from exc
+
+
+def _write_series(path: Path, header: str, values: list[float]) -> None:
+    lines = [f"# {header}"]
+    lines.extend(f"{index} {value:.12f}" for index, value in enumerate(values))
+    path.write_text("\n".join(lines) + "\n")
 
 
 def _first_match(text: str, pattern: str) -> str | None:

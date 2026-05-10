@@ -9,6 +9,7 @@
 - Directory scan.
 - Single-file inspect.
 - CSV/JSON export.
+- ORCA optimization energy and bond-distance text export.
 - Basic terminal UI when run in a real terminal.
 
 ## Support
@@ -20,6 +21,7 @@ Current:
 - Gaussian: experimental `.log`/`.out` status, route method/basis, charge/multiplicity, final energy, frequencies, runtime, and termination markers.
 - Q-Chem: experimental status, method/basis, charge/multiplicity, final energy, frequencies, runtime, and convergence markers.
 - xTB/CREST: experimental status, method hints, final energy, runtime, and convergence markers.
+- ORCA optimization history: electronic energy from `orca.out` and one zero-based atom-pair distance from `orca_trj.xyz`.
 
 Not yet supported:
 
@@ -36,6 +38,7 @@ cctop path/to/orca.out
 cctop export .
 cctop export batch_a batch_b --format json
 cctop export . --format json
+cctop orca-history path/to/job 0 12
 ```
 
 Directory scans recurse into subdirectories, so `cctop .` works for project folders with one job per subfolder.
@@ -47,6 +50,14 @@ Try the demo data:
 ```bash
 cctop testing/demo_orca_project
 ```
+
+For an ORCA optimization job whose output is `orca.out` and trajectory is `orca_trj.xyz`, export gnuplot-friendly histories with:
+
+```bash
+cctop orca-history path/to/job 0 12 --energy-output energy.txt --distance-output bond.txt
+```
+
+The atom indices are zero-based. Each text file contains two columns: optimization step and value.
 
 ## Install
 

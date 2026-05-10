@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from cctop.models import Status
-from cctop.orca import parse_orca
+from cctop.orca import parse_orca, parse_orca_optimization_history
 
 
 ORCA_DONE = """
@@ -149,6 +149,30 @@ TOTAL RUN TIME: 0 days 1 hours 2 minutes 3 seconds
 ****ORCA TERMINATED NORMALLY****
 """
 
+ORCA_OPT_HISTORY = """
+O   R   C   A
+Program Version 6.0.0
+! B3LYP def2-SVP Opt
+FINAL SINGLE POINT ENERGY     -1.010000000
+FINAL SINGLE POINT ENERGY     -1.120000000
+FINAL SINGLE POINT ENERGY     -1.123456789
+"""
+
+ORCA_TRAJECTORY = """2
+Coordinates from ORCA-job orca E -1.010000000
+H 0.0 0.0 0.0
+H 0.0 0.0 1.0
+2
+Coordinates from ORCA-job orca E -1.120000000
+H 0.0 0.0 0.0
+H 0.0 0.0 1.2
+3
+Coordinates from ORCA-job orca E -1.123456789
+H 0.0 0.0 0.0
+H 0.0 1.0 0.0
+O 0.0 0.0 0.0
+"""
+
 
 class OrcaParserTest(unittest.TestCase):
     def test_done_output(self) -> None:
@@ -201,6 +225,23 @@ class OrcaParserTest(unittest.TestCase):
         self.assertEqual(calc.status, Status.SUSPICIOUS)
         self.assertEqual(calc.imaginary_frequency_count, 1)
         self.assertAlmostEqual(calc.lowest_frequency or 0.0, -187.25)
+
+    def test_parses_optimization_energy_and_distance_history(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            output_path = root / "orca.out"
+            trajectory_path = root / "orca_trj.xyz"
+            output_path.write_text(ORCA_OPT_HISTORY)
+            trajectory_path.write_text(ORCA_TRAJECTORY)
+
+            history = parse_orca_optimization_history(output_path, 0, 1)
+
+        self.assertEqual(history.energies, [-1.01, -1.12, -1.123456789])
+        self.assertEqual(history.trajectory_path, trajectory_path)
+        self.assertEqual(len(history.distances), 3)
+        self.assertAlmostEqual(history.distances[0], 1.0)
+        self.assertAlmostEqual(history.distances[1], 1.2)
+        self.assertAlmostEqual(history.distances[2], 1.0)
 
     def _parse(self, content: str):
         with tempfile.TemporaryDirectory() as tmp:
