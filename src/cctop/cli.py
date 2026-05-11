@@ -24,10 +24,11 @@ def main(argv: list[str] | None = None) -> int:
 def _view_main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="cctop", description="Inspect computational chemistry output files.")
     parser.add_argument("paths", nargs="*", help="Output file or directory to inspect.")
+    parser.add_argument("--exclude", metavar="PATTERN", action="append", default=[], help="Glob pattern to exclude files (can be repeated).")
     args = parser.parse_args(argv)
 
     paths = _input_paths(args.paths)
-    calculations = load_many_calculations(paths)
+    calculations = load_many_calculations(paths, exclude=args.exclude)
     root = _display_root(paths)
 
     if not calculations:
@@ -46,10 +47,11 @@ def _export_main(argv: list[str]) -> int:
     parser.add_argument("paths", nargs="*", help="Output file or directory to scan.")
     parser.add_argument("--format", choices=("csv", "json"), default="csv", help="Export format.")
     parser.add_argument("--output", "-o", help="Output path.")
+    parser.add_argument("--exclude", metavar="PATTERN", action="append", default=[], help="Glob pattern to exclude files (can be repeated).")
     args = parser.parse_args(argv)
 
     paths = _input_paths(args.paths)
-    calculations = load_many_calculations(paths)
+    calculations = load_many_calculations(paths, exclude=args.exclude)
     if not calculations:
         print("cctop export: no supported output files found", file=sys.stderr)
         return 1
